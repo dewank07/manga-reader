@@ -1,252 +1,410 @@
+"use client"
+
+import { useState } from "react"
+import { Search, BookOpen, Heart, Star, Eye, TrendingUp, Users, Award, ArrowRight, Play, LogIn } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Star, TrendingUp, Clock, Eye } from "lucide-react"
-import Image from "next/image"
+import Navigation from "@/components/layout/Navigation"
 import Link from "next/link"
 
-// Mock data for manga
+// Mock featured manga data
 const featuredManga = [
   {
     id: 1,
-    title: "Dragon's Legacy",
-    cover: "/placeholder.svg?height=300&width=200",
+    title: "Shadow Chronicles",
+    author: "Akira Yamamoto",
+    genre: ["Action", "Drama"],
     rating: 4.8,
     chapters: 156,
+    views: "2.3M",
+    cover: "/dark-manga-shadow-chronicles.png",
+    description: "A tale of shadows and light in a world torn between dimensions.",
     status: "Ongoing",
-    genre: ["Action", "Fantasy"],
-    views: "2.1M",
+    featured: true,
   },
   {
     id: 2,
-    title: "Mystic Academy",
-    cover: "/placeholder.svg?height=300&width=200",
+    title: "Silent Blade",
+    author: "Mei Tanaka",
+    genre: ["Action", "Thriller"],
     rating: 4.6,
     chapters: 89,
-    status: "Ongoing",
-    genre: ["Romance", "School"],
     views: "1.8M",
+    cover: "/minimalist-manga-cover-silent-blade.png",
+    description: "A master assassin's journey through betrayal and redemption.",
+    status: "Completed",
+    featured: true,
   },
   {
     id: 3,
-    title: "Shadow Hunter",
-    cover: "/placeholder.svg?height=300&width=200",
-    rating: 4.9,
-    chapters: 203,
-    status: "Completed",
-    genre: ["Action", "Thriller"],
-    views: "3.2M",
-  },
-]
-
-const popularManga = [
-  {
-    id: 4,
-    title: "Celestial Warrior",
-    cover: "/placeholder.svg?height=300&width=200",
-    rating: 4.7,
-    chapters: 124,
-    status: "Ongoing",
-    genre: ["Sci-Fi", "Action"],
-    views: "1.9M",
-  },
-  {
-    id: 5,
-    title: "Love in Tokyo",
-    cover: "/placeholder.svg?height=300&width=200",
-    rating: 4.5,
-    chapters: 67,
-    status: "Ongoing",
+    title: "Monochrome Dreams",
+    author: "Hiroshi Sato",
     genre: ["Romance", "Slice of Life"],
-    views: "1.4M",
-  },
-  {
-    id: 6,
-    title: "Demon Slayer Chronicles",
-    cover: "/placeholder.svg?height=300&width=200",
-    rating: 4.8,
-    chapters: 178,
+    rating: 4.9,
+    chapters: 45,
+    views: "956K",
+    cover: "/black-and-white-manga-dreams.png",
+    description: "Love blooms in a world painted in shades of gray.",
     status: "Ongoing",
-    genre: ["Action", "Supernatural"],
-    views: "2.7M",
+    featured: true,
   },
 ]
 
-const recentUpdates = [
-  {
-    id: 7,
-    title: "Magic Knight Academy",
-    cover: "/placeholder.svg?height=300&width=200",
-    chapter: "Chapter 45",
-    timeAgo: "2 hours ago",
-    genre: ["Fantasy", "Action"],
-  },
-  {
-    id: 8,
-    title: "Cyber Punk 2087",
-    cover: "/placeholder.svg?height=300&width=200",
-    chapter: "Chapter 23",
-    timeAgo: "5 hours ago",
-    genre: ["Sci-Fi", "Action"],
-  },
-  {
-    id: 9,
-    title: "High School Heroes",
-    cover: "/placeholder.svg?height=300&width=200",
-    chapter: "Chapter 78",
-    timeAgo: "1 day ago",
-    genre: ["School", "Superhero"],
-  },
+const stats = [
+  { icon: BookOpen, label: "Total Manga", value: "50,000+", color: "text-indigo-400" },
+  { icon: Users, label: "Active Readers", value: "2.5M+", color: "text-blue-400" },
+  { icon: Award, label: "Top Rated", value: "10,000+", color: "text-yellow-400" },
+  { icon: TrendingUp, label: "Daily Updates", value: "500+", color: "text-green-400" },
 ]
 
-function MangaCard({ manga, showChapter = false }: { manga: any; showChapter?: boolean }) {
+export default function LandingPage() {
+  const [searchQuery, setSearchQuery] = useState("")
+  const [showLoginModal, setShowLoginModal] = useState(false)
+
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      window.location.href = `/search?q=${encodeURIComponent(searchQuery)}`
+    } else {
+      window.location.href = "/search"
+    }
+  }
+
   return (
-    <Card className="group overflow-hidden border-0 bg-slate-800/50 hover:bg-slate-800/70 transition-all duration-300 hover:scale-105">
-      <Link href={`/manga/${manga.id}`}>
-        <div className="relative aspect-[3/4] overflow-hidden">
-          <Image
-            src={manga.cover || "/placeholder.svg"}
-            alt={manga.title}
-            fill
-            className="object-cover transition-transform duration-300 group-hover:scale-110"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-          <div className="absolute bottom-2 left-2 right-2">
-            <h3 className="text-white font-semibold text-sm line-clamp-2 mb-1">{manga.title}</h3>
-            {showChapter ? (
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-blue-400">{manga.chapter}</span>
-                <span className="text-gray-400">{manga.timeAgo}</span>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2 text-xs">
-                {manga.rating && (
-                  <div className="flex items-center gap-1 text-yellow-400">
-                    <Star className="w-3 h-3 fill-current" />
-                    <span>{manga.rating}</span>
-                  </div>
-                )}
-                {manga.chapters && <span className="text-gray-400">{manga.chapters} ch</span>}
-              </div>
-            )}
-          </div>
-          {manga.status && (
-            <Badge
-              variant={manga.status === "Completed" ? "default" : "secondary"}
-              className="absolute top-2 right-2 text-xs"
-            >
-              {manga.status}
-            </Badge>
-          )}
-        </div>
-        <CardContent className="p-3">
-          <div className="flex flex-wrap gap-1 mb-2">
-            {manga.genre?.slice(0, 2).map((g: string) => (
-              <Badge key={g} variant="outline" className="text-xs border-slate-600 text-slate-300">
-                {g}
-              </Badge>
-            ))}
-          </div>
-          {manga.views && (
-            <div className="flex items-center gap-1 text-xs text-gray-400">
-              <Eye className="w-3 h-3" />
-              <span>{manga.views}</span>
+    <div className="min-h-screen bg-gray-900">
+      {/* Navigation */}
+      <Navigation />
+
+      {/* Hero Section */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-indigo-900/20">
+        <div className="absolute inset-0 bg-[url('/manga-page-sample-bw.png')] opacity-5 bg-cover bg-center" />
+        <div className="relative container mx-auto px-4 py-20 lg:py-32">
+          <div className="max-w-4xl mx-auto text-center space-y-8">
+            <div className="space-y-4">
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-tight">
+                Discover Your Next
+                <span className="block bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-600 bg-clip-text text-transparent">
+                  Manga Adventure
+                </span>
+              </h1>
+              <p className="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
+                Dive into the world's largest collection of manga with over 50,000 titles, daily updates, and an
+                immersive reading experience.
+              </p>
             </div>
-          )}
-        </CardContent>
-      </Link>
-    </Card>
-  )
-}
 
-export default function HomePage() {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      <div className="container mx-auto px-4 py-6 space-y-8">
-        {/* Hero Section */}
-        <section className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-purple-900/50 to-blue-900/50 p-6 md:p-8">
-          <div className="relative z-10">
-            <h1 className="text-3xl md:text-5xl font-bold text-white mb-4">Discover Amazing Manga</h1>
-            <p className="text-lg text-gray-300 mb-6 max-w-2xl">
-              Dive into thousands of manga series with our premium reading experience. Updated daily with the latest
-              chapters.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button asChild size="lg" className="bg-purple-600 hover:bg-purple-700">
-                <Link href="/search">Explore Manga</Link>
-              </Button>
+            {/* Search Bar */}
+            <div className="max-w-2xl mx-auto">
+              <div className="relative">
+                <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 h-6 w-6 text-gray-400" />
+                <Input
+                  placeholder="Search for manga, authors, or genres..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                  className="pl-16 pr-6 py-6 text-lg bg-gray-800/50 border-gray-600 focus:border-indigo-500 transition-colors text-white placeholder:text-gray-400 rounded-2xl"
+                />
+                <Button
+                  onClick={handleSearch}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-indigo-600 hover:bg-indigo-700 px-8 py-3 rounded-xl"
+                >
+                  Search
+                </Button>
+              </div>
+            </div>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Link href="/search">
+                <Button size="lg" className="bg-indigo-600 hover:bg-indigo-700 px-8 py-4 text-lg rounded-xl">
+                  Start Reading
+                  <ArrowRight className="h-5 w-5 ml-2" />
+                </Button>
+              </Link>
               <Button
-                asChild
                 variant="outline"
                 size="lg"
-                className="border-white/20 text-white hover:bg-white/10 bg-transparent"
+                className="border-gray-600 hover:bg-indigo-500/20 px-8 py-4 text-lg rounded-xl bg-transparent"
               >
-                <Link href="#trending">View Trending</Link>
+                <Play className="h-5 w-5 mr-2" />
+                Watch Trailer
               </Button>
             </div>
           </div>
-          <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-blue-600/20" />
-        </section>
+        </div>
+      </section>
 
-        {/* Featured Manga */}
-        <section>
-          <div className="flex items-center gap-3 mb-6">
-            <TrendingUp className="w-6 h-6 text-purple-400" />
-            <h2 className="text-2xl font-bold text-white">Featured Manga</h2>
+      {/* Stats Section */}
+      <section className="py-16 bg-gray-800/50">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {stats.map((stat, index) => (
+              <div key={index} className="text-center space-y-3">
+                <div className="mx-auto w-16 h-16 bg-gray-700/50 rounded-2xl flex items-center justify-center">
+                  <stat.icon className={`h-8 w-8 ${stat.color}`} />
+                </div>
+                <div>
+                  <div className="text-2xl md:text-3xl font-bold text-white">{stat.value}</div>
+                  <div className="text-gray-400">{stat.label}</div>
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        </div>
+      </section>
+
+      {/* Featured Manga Section */}
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Featured This Week</h2>
+            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+              Discover the most popular and highly-rated manga that everyone's talking about
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {featuredManga.map((manga) => (
-              <MangaCard key={manga.id} manga={manga} />
+              <Card
+                key={manga.id}
+                className="group hover:shadow-2xl hover:shadow-indigo-500/25 transition-all duration-500 cursor-pointer bg-gray-800/50 backdrop-blur-sm border-gray-700 hover:border-indigo-500/50 overflow-hidden"
+              >
+                <CardContent className="p-0">
+                  <div className="relative overflow-hidden">
+                    <img
+                      src={manga.cover || "/placeholder.svg"}
+                      alt={manga.title}
+                      className="w-full h-80 object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                    <Badge className="absolute top-4 left-4 bg-indigo-600/90 text-white px-3 py-1">
+                      {manga.status}
+                    </Badge>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="absolute top-4 right-4 bg-black/50 backdrop-blur-sm hover:bg-indigo-600/80 text-white"
+                    >
+                      <Heart className="h-5 w-5" />
+                    </Button>
+                    <div className="absolute bottom-4 left-4 right-4">
+                      <h3 className="font-bold text-xl text-white mb-2 group-hover:text-indigo-400 transition-colors">
+                        {manga.title}
+                      </h3>
+                      <p className="text-gray-300 text-sm mb-3 line-clamp-2">{manga.description}</p>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1 text-yellow-400">
+                          <Star className="h-4 w-4 fill-current" />
+                          <span className="font-semibold">{manga.rating}</span>
+                        </div>
+                        <div className="flex items-center gap-1 text-gray-300">
+                          <Eye className="h-4 w-4" />
+                          <span>{manga.views}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
-        </section>
 
-        {/* Popular This Week */}
-        <section id="trending">
-          <div className="flex items-center gap-3 mb-6">
-            <Star className="w-6 h-6 text-yellow-400" />
-            <h2 className="text-2xl font-bold text-white">Popular This Week</h2>
+          <div className="text-center mt-12">
+            <Link href="/search">
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-indigo-500 hover:bg-indigo-500/20 px-8 py-4 bg-transparent"
+              >
+                View All Manga
+                <ArrowRight className="h-5 w-5 ml-2" />
+              </Button>
+            </Link>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {popularManga.map((manga) => (
-              <MangaCard key={manga.id} manga={manga} />
-            ))}
-          </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Recent Updates */}
-        <section>
-          <div className="flex items-center gap-3 mb-6">
-            <Clock className="w-6 h-6 text-blue-400" />
-            <h2 className="text-2xl font-bold text-white">Recent Updates</h2>
+      {/* Features Section */}
+      <section className="py-20 bg-gray-800/30">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Why Choose MangaVault?</h2>
+            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+              Experience manga like never before with our cutting-edge features and vast library
+            </p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {recentUpdates.map((manga) => (
-              <MangaCard key={manga.id} manga={manga} showChapter />
-            ))}
-          </div>
-        </section>
 
-        {/* Quick Stats */}
-        <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card className="bg-slate-800/50 border-slate-700 text-center p-6">
-            <div className="text-2xl font-bold text-purple-400 mb-2">10,000+</div>
-            <div className="text-gray-300">Manga Series</div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <Card className="bg-gray-800/50 border-gray-700 text-center p-8">
+              <CardContent className="space-y-4">
+                <div className="mx-auto w-16 h-16 bg-indigo-600/20 rounded-2xl flex items-center justify-center">
+                  <BookOpen className="h-8 w-8 text-indigo-400" />
+                </div>
+                <h3 className="text-xl font-semibold text-white">Vast Library</h3>
+                <p className="text-gray-400">
+                  Access over 50,000 manga titles from every genre imaginable, with new releases added daily.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gray-800/50 border-gray-700 text-center p-8">
+              <CardContent className="space-y-4">
+                <div className="mx-auto w-16 h-16 bg-indigo-600/20 rounded-2xl flex items-center justify-center">
+                  <Star className="h-8 w-8 text-indigo-400" />
+                </div>
+                <h3 className="text-xl font-semibold text-white">Premium Quality</h3>
+                <p className="text-gray-400">
+                  Enjoy high-resolution images and crystal-clear text for the best reading experience possible.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gray-800/50 border-gray-700 text-center p-8">
+              <CardContent className="space-y-4">
+                <div className="mx-auto w-16 h-16 bg-indigo-600/20 rounded-2xl flex items-center justify-center">
+                  <Users className="h-8 w-8 text-indigo-400" />
+                </div>
+                <h3 className="text-xl font-semibold text-white">Community</h3>
+                <p className="text-gray-400">
+                  Join millions of readers, share reviews, and discover new favorites through our community features.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-gray-800 border-t border-gray-700 py-12">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-indigo-600/20 rounded-lg">
+                  <BookOpen className="h-6 w-6 text-indigo-400" />
+                </div>
+                <h3 className="text-xl font-bold bg-gradient-to-r from-indigo-400 to-indigo-600 bg-clip-text text-transparent">
+                  MangaVault
+                </h3>
+              </div>
+              <p className="text-gray-400">
+                Your ultimate destination for manga reading with the largest collection and best experience.
+              </p>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-white mb-4">Browse</h4>
+              <div className="space-y-2">
+                <Link href="/search" className="block text-gray-400 hover:text-indigo-400 transition-colors">
+                  All Manga
+                </Link>
+                <Link href="#" className="block text-gray-400 hover:text-indigo-400 transition-colors">
+                  Popular
+                </Link>
+                <Link href="#" className="block text-gray-400 hover:text-indigo-400 transition-colors">
+                  Latest Updates
+                </Link>
+                <Link href="#" className="block text-gray-400 hover:text-indigo-400 transition-colors">
+                  Top Rated
+                </Link>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-white mb-4">Genres</h4>
+              <div className="space-y-2">
+                <Link href="#" className="block text-gray-400 hover:text-indigo-400 transition-colors">
+                  Action
+                </Link>
+                <Link href="#" className="block text-gray-400 hover:text-indigo-400 transition-colors">
+                  Romance
+                </Link>
+                <Link href="#" className="block text-gray-400 hover:text-indigo-400 transition-colors">
+                  Fantasy
+                </Link>
+                <Link href="#" className="block text-gray-400 hover:text-indigo-400 transition-colors">
+                  Sci-Fi
+                </Link>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-white mb-4">Support</h4>
+              <div className="space-y-2">
+                <Link href="#" className="block text-gray-400 hover:text-indigo-400 transition-colors">
+                  Help Center
+                </Link>
+                <Link href="#" className="block text-gray-400 hover:text-indigo-400 transition-colors">
+                  Contact Us
+                </Link>
+                <Link href="#" className="block text-gray-400 hover:text-indigo-400 transition-colors">
+                  Privacy Policy
+                </Link>
+                <Link href="#" className="block text-gray-400 hover:text-indigo-400 transition-colors">
+                  Terms of Service
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+            <p>&copy; 2024 MangaVault. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
+
+      {/* Login Modal */}
+      {showLoginModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <Card className="w-full max-w-md bg-gray-800 border-gray-700">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-white">Welcome Back</h2>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowLoginModal(false)}
+                  className="hover:bg-gray-700"
+                >
+                  <LogIn className="h-4 w-4" />
+                </Button>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium text-gray-300 mb-2 block">Email</label>
+                  <Input
+                    type="email"
+                    placeholder="Enter your email"
+                    className="bg-gray-700/50 border-gray-600 focus:border-indigo-500 text-white"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-300 mb-2 block">Password</label>
+                  <Input
+                    type="password"
+                    placeholder="Enter your password"
+                    className="bg-gray-700/50 border-gray-600 focus:border-indigo-500 text-white"
+                  />
+                </div>
+                <Button className="w-full bg-indigo-600 hover:bg-indigo-700 py-3">
+                  <LogIn className="h-4 w-4 mr-2" />
+                  Sign In
+                </Button>
+                <div className="text-center">
+                  <p className="text-gray-400">
+                    Don't have an account?{" "}
+                    <Button variant="link" className="text-indigo-400 hover:text-indigo-300 p-0">
+                      Sign up here
+                    </Button>
+                  </p>
+                </div>
+              </div>
+            </CardContent>
           </Card>
-          <Card className="bg-slate-800/50 border-slate-700 text-center p-6">
-            <div className="text-2xl font-bold text-blue-400 mb-2">500K+</div>
-            <div className="text-gray-300">Chapters</div>
-          </Card>
-          <Card className="bg-slate-800/50 border-slate-700 text-center p-6">
-            <div className="text-2xl font-bold text-green-400 mb-2">1M+</div>
-            <div className="text-gray-300">Active Readers</div>
-          </Card>
-          <Card className="bg-slate-800/50 border-slate-700 text-center p-6">
-            <div className="text-2xl font-bold text-yellow-400 mb-2">Daily</div>
-            <div className="text-gray-300">Updates</div>
-          </Card>
-        </section>
-      </div>
+        </div>
+      )}
     </div>
   )
 }
